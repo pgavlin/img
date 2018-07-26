@@ -35,12 +35,14 @@ func (cmd *loginCommand) Register(fs *flag.FlagSet) {
 	fs.StringVar(&cmd.user, "u", "", "Username")
 	fs.StringVar(&cmd.password, "p", "", "Password")
 	fs.BoolVar(&cmd.passwordStdin, "password-stdin", false, "Take the password from stdin")
+	fs.BoolVar(&cmd.insecure, "insecure-registry", false, "Allow insecure registries")
 }
 
 type loginCommand struct {
 	user          string
 	password      string
 	passwordStdin bool
+	insecure      bool
 
 	serverAddress string
 }
@@ -85,7 +87,7 @@ func (cmd *loginCommand) Run(args []string) error {
 	}
 
 	// Attempt to login to the registry.
-	r, err := registryapi.New(authConfig, registryapi.Opt{Debug: debug})
+	r, err := registryapi.New(authConfig, registryapi.Opt{Debug: debug, Insecure: cmd.insecure})
 	if err != nil {
 		return fmt.Errorf("creating registry client failed: %v", err)
 	}
